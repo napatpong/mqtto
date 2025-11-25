@@ -15,22 +15,45 @@
     </div>
     <div class="card mb-4">
       <div class="card-header">User Management</div>
-      <div class="card-body row g-2 align-items-end">
-        <div class="col-md-4">
-          <label class="form-label">Username</label>
-          <input class="form-control" placeholder="Username" v-model="username" />
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">Password</label>
-          <input class="form-control" placeholder="Password" type="password" v-model="password" />
-        </div>
-        <div class="col-md-4 d-flex gap-2">
-          <button class="btn btn-primary flex-fill" @click="handleAddUser">Add/Update User</button>
-          <button class="btn btn-outline-danger flex-fill" @click="handleDeleteUser">Delete User</button>
+      <div class="card-body">
+        <div class="row g-2 align-items-end mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Username</label>
+            <input class="form-control" placeholder="Username" v-model="username" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Password</label>
+            <input class="form-control" placeholder="Password" type="password" v-model="password" />
+          </div>
+          <div class="col-md-4 d-flex gap-2">
+            <button class="btn btn-primary flex-fill" @click="handleAddUser">เพิ่ม/เปลี่ยนรหัสผ่าน</button>
+            <button class="btn btn-outline-danger flex-fill" @click="handleDeleteUser">ลบ User</button>
+          </div>
         </div>
         <div class="col-12 mt-2">
           <div v-if="message" class="alert" :class="messageClass">{{ message }}</div>
         </div>
+        <hr />
+        <h6>รายชื่อผู้ใช้ในระบบ</h6>
+        <table class="table table-bordered table-sm align-middle bg-white">
+          <thead class="table-light">
+            <tr>
+              <th style="width:1%">#</th>
+              <th>Username</th>
+              <th style="width:1%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(user, idx) in users" :key="user">
+              <td>{{ idx+1 }}</td>
+              <td>{{ user }}</td>
+              <td>
+                <button class="btn btn-outline-secondary btn-sm" @click="selectUser(user)">เลือก</button>
+              </td>
+            </tr>
+            <tr v-if="users.length === 0"><td colspan="3" class="text-center text-muted">ไม่มีผู้ใช้</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div class="card">
@@ -43,6 +66,21 @@
 </template>
 
 <script setup>
+const users = ref([]);
+
+const fetchUsers = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/api/users`);
+    users.value = res.data.users || [];
+  } catch (e) {
+    users.value = [];
+  }
+};
+
+const selectUser = (user) => {
+  username.value = user;
+  password.value = '';
+};
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 
@@ -77,12 +115,13 @@ const handleStop = async () => {
 
 const handleAddUser = async () => {
   if (!username.value || !password.value) {
-    message.value = 'Username and password required';
+    message.value = 'กรุณากรอก Username และ Password';
     return;
   }
   try {
     await axios.post(`${API_BASE}/api/user`, { username: username.value, password: password.value });
-    message.value = 'User added/updated';
+    message.value = 'เพิ่ม/เปลี่ยนรหัสผ่านผู้ใช้สำเร็จ';
+    fetchUsers();
   } catch (e) {
     message.value = 'Error: ' + (e.response?.data?.error || e.message);
   }
@@ -90,12 +129,15 @@ const handleAddUser = async () => {
 
 const handleDeleteUser = async () => {
   if (!username.value) {
-    message.value = 'Username required';
+    message.value = 'กรุณาเลือกหรือกรอก Username ที่ต้องการลบ';
     return;
   }
   try {
     await axios.delete(`${API_BASE}/api/user/${username.value}`);
-    message.value = 'User deleted';
+    message.value = 'ลบผู้ใช้สำเร็จ';
+    fetchUsers();
+    username.value = '';
+    password.value = '';
   } catch (e) {
     message.value = 'Error: ' + (e.response?.data?.error || e.message);
   }
@@ -127,5 +169,6 @@ const messageClass = computed(() => {
 onMounted(() => {
   fetchStatus();
   fetchLog();
+  fetchUsers();
 });
 </script>

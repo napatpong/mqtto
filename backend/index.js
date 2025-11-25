@@ -1,3 +1,15 @@
+// List all users
+app.get('/api/users', (req, res) => {
+  exec('cat /etc/mosquitto/passwd', (err, stdout) => {
+    if (err) return res.status(500).json({ error: err.message });
+    // Each line: username:hash
+    const users = stdout
+      .split('\n')
+      .filter(line => line.trim() && line.includes(':'))
+      .map(line => line.split(':')[0]);
+    res.json({ users });
+  });
+});
 import express from 'express';
 import cors from 'cors';
 import { exec } from 'child_process';
