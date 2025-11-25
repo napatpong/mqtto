@@ -4,12 +4,12 @@
     <div class="card mb-4">
       <div class="card-body d-flex align-items-center justify-content-between">
         <div>
-          <span class="fw-bold">Status:</span>
-          <span :class="statusClass">{{ status }}</span>
+          <span class="fw-bold">สถานะ Mosquitto:</span>
+          <span :class="statusClass" style="font-size:1.1em; margin-left:8px;">{{ statusLabel }}</span>
         </div>
         <div>
-          <button class="btn btn-success me-2" @click="handleStart">Start</button>
-          <button class="btn btn-danger" @click="handleStop">Stop</button>
+          <button class="btn btn-success me-2" @click="handleStart">เริ่ม (Start)</button>
+          <button class="btn btn-danger" @click="handleStop">หยุด (Stop)</button>
         </div>
       </div>
     </div>
@@ -101,10 +101,21 @@ const handleDeleteUser = async () => {
   }
 };
 
+
+const statusLabel = computed(() => {
+  if (status.value === 'active') return 'กำลังทำงาน';
+  if (status.value === 'inactive') return 'หยุดทำงาน';
+  if (status.value === 'failed') return 'ล้มเหลว';
+  if (status.value === 'unknown') return 'ไม่ทราบสถานะ';
+  return status.value;
+});
+
 const statusClass = computed(() => {
-  if (status.value === 'active') return 'text-success fw-bold';
-  if (status.value === 'inactive') return 'text-danger fw-bold';
-  return 'text-secondary';
+  if (status.value === 'active') return 'badge bg-success';
+  if (status.value === 'inactive') return 'badge bg-secondary';
+  if (status.value === 'failed') return 'badge bg-danger';
+  if (status.value === 'unknown') return 'badge bg-warning text-dark';
+  return 'badge bg-light text-dark';
 });
 
 const messageClass = computed(() => {
