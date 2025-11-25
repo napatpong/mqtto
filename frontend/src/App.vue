@@ -52,23 +52,26 @@ const username = ref('');
 const password = ref('');
 const message = ref('');
 
+
+const API_BASE = 'http://localhost:4000';
+
 const fetchStatus = async () => {
-  const res = await axios.get('/api/status');
+  const res = await axios.get(`${API_BASE}/api/status`);
   status.value = res.data.status;
 };
 
 const fetchLog = async () => {
-  const res = await axios.get('/api/log');
+  const res = await axios.get(`${API_BASE}/api/log`);
   log.value = res.data.log;
 };
 
 const handleStart = async () => {
-  await axios.post('/api/start');
+  await axios.post(`${API_BASE}/api/start`);
   fetchStatus();
 };
 
 const handleStop = async () => {
-  await axios.post('/api/stop');
+  await axios.post(`${API_BASE}/api/stop`);
   fetchStatus();
 };
 
@@ -78,7 +81,7 @@ const handleAddUser = async () => {
     return;
   }
   try {
-    await axios.post('/api/user', { username: username.value, password: password.value });
+    await axios.post(`${API_BASE}/api/user`, { username: username.value, password: password.value });
     message.value = 'User added/updated';
   } catch (e) {
     message.value = 'Error: ' + (e.response?.data?.error || e.message);
@@ -91,7 +94,7 @@ const handleDeleteUser = async () => {
     return;
   }
   try {
-    await axios.delete(`/api/user/${username.value}`);
+    await axios.delete(`${API_BASE}/api/user/${username.value}`);
     message.value = 'User deleted';
   } catch (e) {
     message.value = 'Error: ' + (e.response?.data?.error || e.message);
