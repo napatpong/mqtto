@@ -53,7 +53,7 @@ const password = ref('');
 const message = ref('');
 
 
-const API_BASE = 'http://localhost:4000';
+const API_BASE = 'http://mqtto.itc.in.th:4000';
 
 const fetchStatus = async () => {
   const res = await axios.get(`${API_BASE}/api/status`);
