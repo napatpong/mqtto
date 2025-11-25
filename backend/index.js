@@ -1,3 +1,12 @@
+
+import express from 'express';
+import cors from 'cors';
+import { exec } from 'child_process';
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
 // List all users
 app.get('/api/users', (req, res) => {
   exec('cat /etc/mosquitto/passwd', (err, stdout) => {
@@ -10,13 +19,6 @@ app.get('/api/users', (req, res) => {
     res.json({ users });
   });
 });
-import express from 'express';
-import cors from 'cors';
-import { exec } from 'child_process';
-
-const app = express();
-app.use(cors());
-app.use(express.json());
 
 // Health check
 app.get('/', (req, res) => {
